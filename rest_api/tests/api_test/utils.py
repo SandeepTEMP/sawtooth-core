@@ -177,6 +177,18 @@ def post_batch(batch, headers="None"):
     response = submit_request('{}&wait={}'.format(response['link'], WAIT))
     return response
 
+def post_batch_no_endpoint(batch, headers="None"):
+    if headers=="True":
+        headers = {'Content-Type': 'application/json'}  
+    else:
+        headers = {'Content-Type': 'application/octet-stream'}
+    
+    response = query_rest_api(
+        '/', data=batch, headers=headers)
+    
+    response = submit_request('{}&wait={}'.format(response['link'], WAIT))
+    return response
+
 def query_rest_api(suffix='', data=None, headers=None):
     if headers is None:
         headers = {}
@@ -274,7 +286,7 @@ def _make_http_address(node_number):
     node_number = node.replace('8800' , '8008')
     return node_number
 
-def _get_client_address():  
+def _get_client_address(): 
     command = "hostname -I | awk '{print $1}'"
     node_ip = subprocess.check_output(command , shell=True).decode().strip().replace("'", '"')
     return 'http://' + node_ip + ':8008'
