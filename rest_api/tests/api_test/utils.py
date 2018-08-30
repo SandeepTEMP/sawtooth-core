@@ -290,7 +290,7 @@ def _get_client_address():
     command = "hostname -I | awk '{print $1}'"
     node_ip = subprocess.check_output(command , shell=True).decode().strip().replace("'", '"')
     return 'http://' + node_ip + ':8008'
-
+    
 def _start_validator():
     LOGGER.info('Starting the validator')
     cmd = "sudo -u sawtooth sawtooth-validator -vv"

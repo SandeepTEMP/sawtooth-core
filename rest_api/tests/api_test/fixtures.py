@@ -138,206 +138,49 @@ def setup_batch_valinv_txns(request):
     """Setup method for posting batches and returning the 
        response
     """
-    data = {}
     signer = get_signer()
-    expected_trxn_ids  = []
-    expected_batch_ids = []
-    expected_trxns  = {}
-    expected_batches = []
-    initial_batch_length = batch_count()
-    initial_transaction_length = transaction_count()
-
-    LOGGER.info("Creating intkey transactions with set operations")
-    
+    data = {}
     txns = [
         create_intkey_transaction("set",[],30, signer),
-        create_intkey_same_transaction("set",[],30, signer),
-        create_intkey_same_transaction("set",[],30, signer),
+        create_intkey_transaction("set",[],30, signer),
+        create_invalid_intkey_transaction("set",[],30, signer),
     ]
-
-    for txn in txns:
-        dict = MessageToDict(
-                txn,
-                including_default_value_fields=True,
-                preserving_proto_field_name=True)
-
-        trxn_id = dict['header_signature']
-        expected_trxn_ids.append(trxn_id)
-    
-    data['expected_trxn_ids'] = expected_trxn_ids
-    expected_trxns['trxn_id'] = [dict['header_signature']]
-    expected_trxns['payload'] = [dict['payload']]
-
-
-    LOGGER.info("Creating batches for transactions 1trn/batch")
-
-    batches = [create_batch(txns, signer)]
-    for batch in batches:
-        dict = MessageToDict(
-                batch,
-                including_default_value_fields=True,
-                preserving_proto_field_name=True)
-
-        batch_id = dict['header_signature']
-        expected_batches.append(batch_id)
-    length_batches = len(expected_batches)
-    length_transactions = len(expected_trxn_ids)
-    
-    post_batch_list = [BatchList(batches=[batch]).SerializeToString() for batch in batches]
-    try:
-        for batch in post_batch_list:
-            response = post_batch(batch)
-            batch_id = dict['header_signature']
-            expected_batches.append(batch_id)
-            
-    except urllib.error.HTTPError as error:
-        LOGGER.info("Rest Api is not reachable")
-        json_data = json.loads(error.fp.read().decode('utf-8'))
-        LOGGER.info(json_data['error']['title'])
-        LOGGER.info(json_data['error']['message']) 
-        LOGGER.info(json_data['error']['code']) 
-    
-    data['code'] = json_data['error']['code']
-    data['initial_batch_length'] = initial_batch_length
-    data['initial_trn_length'] = initial_transaction_length
-    data['expected_batch_length'] = initial_batch_length + length_batches
-    data['expected_trn_length'] = initial_transaction_length + length_transactions
-    return data   
-
+    data = txns_commit_data(txns,signer, data)
+    return data
+   
 @pytest.fixture(scope="session")
 def setup_batch_invval_txns(request):
     """Setup method for posting batches and returning the 
        response
     """
-    data = {}
     signer = get_signer()
-    expected_trxn_ids  = []
-    expected_batch_ids = []
-    expected_trxns  = {}
-    expected_batches = []
-    initial_batch_length = batch_count()
-    initial_transaction_length = transaction_count()
-
-    LOGGER.info("Creating intkey transactions with set operations")
+    data = {}
     
     txns = [
-        create_intkey_same_transaction("set",[],30, signer),
-        create_intkey_same_transaction("set",[],30, signer),
+        create_invalid_intkey_transaction("set",[],30, signer),
+        create_intkey_transaction("set",[],30, signer),
         create_intkey_transaction("set",[],30, signer),
     ]
-   
-    for txn in txns:
-        dict = MessageToDict(
-                txn,
-                including_default_value_fields=True,
-                preserving_proto_field_name=True)
-
-        trxn_id = dict['header_signature']
-        expected_trxn_ids.append(trxn_id)
-    
-    data['expected_trxn_ids'] = expected_trxn_ids
-    expected_trxns['trxn_id'] = [dict['header_signature']]
-    expected_trxns['payload'] = [dict['payload']]
-
-
-    LOGGER.info("Creating batches for transactions 1trn/batch")
-
-    batches = [create_batch(txns, signer)]
-    for batch in batches:
-        dict = MessageToDict(
-                batch,
-                including_default_value_fields=True,
-                preserving_proto_field_name=True)
-        batch_id = dict['header_signature']
-        expected_batches.append(batch_id)
-    length_batches = len(expected_batches)
-    length_transactions = len(expected_trxn_ids)
-    
-    post_batch_list = [BatchList(batches=[batch]).SerializeToString() for batch in batches]
-    try:
-        for batch in post_batch_list:
-            response = post_batch(batch)
-            batch_id = dict['header_signature']
-            expected_batches.append(batch_id)
-    except urllib.error.HTTPError as error:
-        LOGGER.info("Rest Api is not reachable")
-        json_data = json.loads(error.fp.read().decode('utf-8'))
-        LOGGER.info(json_data['error']['title'])
-        LOGGER.info(json_data['error']['message']) 
-        LOGGER.info(json_data['error']['code'])
-  
-    data['code'] = json_data['error']['code']
-    data['initial_batch_length'] = initial_batch_length
-    data['initial_trn_length'] = initial_transaction_length
-    data['expected_batch_length'] = initial_batch_length + length_batches
-    data['expected_trn_length'] = initial_transaction_length + length_transactions 
+    data = txns_commit_data(txns,signer, data)
     return data
+    
 
 @pytest.fixture(scope="session")
 def setup_batch_invalid_txns(request):
     """Setup method for posting batches and returning the 
        response
     """
-    data = {}
     signer = get_signer()
-    expected_trxn_ids  = []
-    expected_batch_ids = []
-    expected_trxns  = {}
-    expected_batches = []
-    initial_batch_length = batch_count()
-    initial_transaction_length = transaction_count()
-
-    LOGGER.info("Creating intkey transactions with set operations")
-    
-    txns = [
-        create_intkey_same_transaction("set",[],30, signer),
-        create_intkey_same_transaction("set",[],30, signer),
-    ]
-
-    for txn in txns:
-        dict = MessageToDict(
-                txn,
-                including_default_value_fields=True,
-                preserving_proto_field_name=True)
-        trxn_id = dict['header_signature']
-        expected_trxn_ids.append(trxn_id)
-    data['expected_trxn_ids'] = expected_trxn_ids
-    expected_trxns['trxn_id'] = [dict['header_signature']]
-    expected_trxns['payload'] = [dict['payload']]
-
-    LOGGER.info("Creating batches for transactions 1trn/batch")
-
-    batches = [create_batch(txns, signer)]
-    for batch in batches:
-        dict = MessageToDict(
-                batch,
-                including_default_value_fields=True,
-                preserving_proto_field_name=True)
-
-        batch_id = dict['header_signature']
-        expected_batches.append(batch_id)
-    length_batches = len(expected_batches)
-    length_transactions = len(expected_trxn_ids)
-    
-    post_batch_list = [BatchList(batches=[batch]).SerializeToString() for batch in batches]
-    try:
-        for batch in post_batch_list:
-            response = post_batch(batch)
-            batch_id = dict['header_signature']
-            expected_batches.append(batch_id)
-    except urllib.error.HTTPError as error:
-        LOGGER.info("Rest Api is not reachable")
-        json_data = json.loads(error.fp.read().decode('utf-8'))
-        LOGGER.info(json_data['error']['title'])
-        LOGGER.info(json_data['error']['message']) 
-        LOGGER.info(json_data['error']['code'])
+    data = {}
         
-    data['code'] = json_data['error']['code']
-    data['initial_batch_length'] = initial_batch_length
-    data['initial_trn_length'] = initial_transaction_length
-    data['expected_batch_length'] = initial_batch_length + length_batches
-    data['expected_trn_length'] = initial_transaction_length + length_transactions 
+    txns = [
+        create_invalid_intkey_transaction("set",[],30, signer),
+        create_invalid_intkey_transaction("set",[],30, signer),
+        create_invalid_intkey_transaction("set",[],30, signer),
+    ]
+    data = txns_commit_data(txns,signer, data)
     return data
+    
 
 @pytest.fixture(scope="function")
 def setup_batch_multiple_transaction():
@@ -378,6 +221,68 @@ def setup_batch_multiple_transaction():
         LOGGER.info(data['error']['message'])    
     
     return expected_trxns
+
+def txns_commit_data(txns, signer, data):
+    """Setup method for posting batches and returning the 
+       response
+    """
+    expected_trxn_ids  = []
+    expected_batch_ids = []
+    expected_trxns  = {}
+    expected_batches = []
+    initial_batch_length = batch_count()
+    initial_transaction_length = transaction_count()
+
+    LOGGER.info("Creating intkey transactions with set operations")
+    
+    for txn in txns:
+        dict = MessageToDict(
+                txn,
+                including_default_value_fields=True,
+                preserving_proto_field_name=True)
+
+        trxn_id = dict['header_signature']
+        expected_trxn_ids.append(trxn_id)
+    
+    data['expected_trxn_ids'] = expected_trxn_ids
+    expected_trxns['trxn_id'] = [dict['header_signature']]
+    expected_trxns['payload'] = [dict['payload']]
+
+
+    LOGGER.info("Creating batches for transactions 3trn/batch")
+
+    batches = [create_batch(txns, signer)]
+    for batch in batches:
+        dict = MessageToDict(
+                batch,
+                including_default_value_fields=True,
+                preserving_proto_field_name=True)
+
+        batch_id = dict['header_signature']
+        expected_batches.append(batch_id)
+    length_batches = len(expected_batches)
+    length_transactions = len(expected_trxn_ids)
+    
+    post_batch_list = [BatchList(batches=[batch]).SerializeToString() for batch in batches]
+    try:
+        for batch in post_batch_list:
+            response = post_batch(batch)
+            batch_id = dict['header_signature']
+            expected_batches.append(batch_id)
+    except urllib.error.HTTPError as error:
+        LOGGER.info("Rest Api is not reachable")
+        json_data = json.loads(error.fp.read().decode('utf-8'))
+        LOGGER.info(json_data['error']['title'])
+        LOGGER.info(json_data['error']['message']) 
+        LOGGER.info(json_data['error']['code']) 
+  
+    data['response'] = response['data'][0]['status'] 
+    data['initial_batch_length'] = initial_batch_length
+    data['initial_trn_length'] = initial_transaction_length
+    data['expected_batch_length'] = initial_batch_length + length_batches
+    data['expected_trn_length'] = initial_transaction_length + length_transactions
+    return data   
+    
 
 
 

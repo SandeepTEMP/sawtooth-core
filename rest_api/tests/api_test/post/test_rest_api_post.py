@@ -360,9 +360,7 @@ class TestPost(RestApiBaseTest):
         signer_trans = get_signer() 
         intkey=create_intkey_transaction("set",[],50,signer_trans)
         translist=[intkey]
-        signer_batch = get_signer()
-        batch= create_batch(translist,signer_batch)
-        
+        batch= create_batch(translist,signer_trans)
         batch_list=[BatchList(batches=[batch]).SerializeToString()]
         for batc in batch_list:
             try:
@@ -371,7 +369,7 @@ class TestPost(RestApiBaseTest):
                 errdata = e.file.read().decode("utf-8")
                 errcode = e.code
             assert errcode == 404
-            
+       
 class TestPostMulTxns(RestApiBaseTest):
      
     def test_rest_api_post_valinv_txns(self, setup_batch_valinv_txns):
@@ -380,10 +378,9 @@ class TestPostMulTxns(RestApiBaseTest):
         expected_batch_length = setup_batch_valinv_txns['expected_batch_length']
         initial_trn_length = setup_batch_valinv_txns['initial_trn_length']
         expected_trn_length = setup_batch_valinv_txns['expected_trn_length']
-        expected_code = setup_batch_valinv_txns['code']
         assert initial_batch_length < expected_batch_length
         assert initial_trn_length < expected_trn_length
-        assert expected_code == 30
+        assert setup_batch_valinv_txns['response'] == 'INVALID'
      
     def test_rest_api_post_invval_txns(self, setup_batch_invval_txns):
         
@@ -393,7 +390,7 @@ class TestPostMulTxns(RestApiBaseTest):
         expected_trn_length = setup_batch_invval_txns['expected_trn_length']
         assert initial_batch_length < expected_batch_length
         assert initial_trn_length < expected_trn_length
-        assert setup_batch_invval_txns['code'] == 30
+        assert setup_batch_invval_txns['response'] == 'INVALID'
         
     def test_rest_api_post_invalid_txns(self, setup_batch_invalid_txns):
         initial_batch_length = setup_batch_invalid_txns['initial_batch_length']
@@ -402,7 +399,7 @@ class TestPostMulTxns(RestApiBaseTest):
         expected_trn_length = setup_batch_invalid_txns['expected_trn_length']
         assert initial_batch_length < expected_batch_length
         assert initial_trn_length < expected_trn_length
-        assert setup_batch_invalid_txns['code'] == 30
+        assert setup_batch_invalid_txns['response'] == 'INVALID'
     
         
     
