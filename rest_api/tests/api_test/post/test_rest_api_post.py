@@ -48,7 +48,8 @@ from payload import get_signer, create_intkey_transaction, create_batch,\
                     create_intkey_same_transaction
 
 from base import RestApiBaseTest
-from fixtures import setup_batch_valinv_txns, setup_batch_invval_txns, setup_batch_invalid_txns
+from fixtures import setup_batch_valinv_txns, setup_batch_invval_txns, setup_batch_invalid_txns, Txns
+
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -64,7 +65,7 @@ WRONG_CONTENT_TYPE = 43
 BLOCK_TO_CHECK_CONSENSUS = 1
 
 pytestmark = pytest.mark.post
-
+data = {}
 
 class TestPost(RestApiBaseTest):
     
@@ -369,38 +370,41 @@ class TestPost(RestApiBaseTest):
                 errdata = e.file.read().decode("utf-8")
                 errcode = e.code
             assert errcode == 404
-       
+
 class TestPostMulTxns(RestApiBaseTest):
-     
-    def test_rest_api_post_valinv_txns(self, setup_batch_valinv_txns):
-        
-        initial_batch_length = setup_batch_valinv_txns['initial_batch_length']
-        expected_batch_length = setup_batch_valinv_txns['expected_batch_length']
-        initial_trn_length = setup_batch_valinv_txns['initial_trn_length']
-        expected_trn_length = setup_batch_valinv_txns['expected_trn_length']
+    def test_txn_invalid_addr(self, Txns):
+        Txns.invalidtype="addr"
+        data=Txns.setup_batch_invalid_txns()
+        initial_batch_length = data['initial_batch_length']
+        expected_batch_length = data['expected_batch_length']
+        initial_trn_length = data['initial_trn_length']
+        expected_trn_length = data['expected_trn_length']
         assert initial_batch_length < expected_batch_length
         assert initial_trn_length < expected_trn_length
-        assert setup_batch_valinv_txns['response'] == 'INVALID'
-     
-    def test_rest_api_post_invval_txns(self, setup_batch_invval_txns):
+        assert data['response'] == 'INVALID'
         
-        initial_batch_length = setup_batch_invval_txns['initial_batch_length']
-        expected_batch_length = setup_batch_invval_txns['expected_batch_length']
-        initial_trn_length = setup_batch_invval_txns['initial_trn_length']
-        expected_trn_length = setup_batch_invval_txns['expected_trn_length']
+    def test_txn_valid_invalid_txns(self, Txns):
+        data=Txns.setup_batch_valinv_txns()
+        initial_batch_length = data['initial_batch_length']
+        expected_batch_length = data['expected_batch_length']
+        initial_trn_length = data['initial_trn_length']
+        expected_trn_length = data['expected_trn_length']
         assert initial_batch_length < expected_batch_length
         assert initial_trn_length < expected_trn_length
-        assert setup_batch_invval_txns['response'] == 'INVALID'
+        assert data['response'] == 'INVALID'
         
-    def test_rest_api_post_invalid_txns(self, setup_batch_invalid_txns):
-        initial_batch_length = setup_batch_invalid_txns['initial_batch_length']
-        expected_batch_length = setup_batch_invalid_txns['expected_batch_length']
-        initial_trn_length = setup_batch_invalid_txns['initial_trn_length']
-        expected_trn_length = setup_batch_invalid_txns['expected_trn_length']
+    def test_txn_invalid_valid_txns(self, Txns):
+        data=Txns.setup_batch_invval_txns()
+        initial_batch_length = data['initial_batch_length']
+        expected_batch_length = data['expected_batch_length']
+        initial_trn_length = data['initial_trn_length']
+        expected_trn_length = data['expected_trn_length']
         assert initial_batch_length < expected_batch_length
         assert initial_trn_length < expected_trn_length
-        assert setup_batch_invalid_txns['response'] == 'INVALID'
-    
+        assert data['response'] == 'INVALID'
+        
+  
+
         
     
         
