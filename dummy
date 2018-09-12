@@ -1,0 +1,13 @@
+1. Whether we need to write tests in python to test rust code ? If so, we need to check interface for python to rust
+
+2. To write test code in rust we require to ramp up on the same
+
+3. WRT LMDB, we wanted to test how validator behaves for the below scenarios, 
+- Start time of validator, if LMDB data is too large (may be 50k transactiosn)
+- Query response time of the validator,  if LMDB data is too large (may be 50k transactiosn)
+- Delete LMDB and reinstall sawtooth
+- Change group and permission of LMDB
+- No LMDB files
+- In multivalidaor also, we can check response time for too big LMDB, update of LMDB after brining node up, permission, reinstall sawtooth etc
+
+4. Apart from rest api, Other exposed interfaces we need to investigate and also unit test we need to investigate
